@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My To-Do List</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #dbe6f6, #c5796d);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .todo-container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      width: 400px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    #taskMessage {
+      color: green;
+      text-align: center;
+      display: none;
+      font-weight: bold;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px;
+      background-color: #6a1b9a;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .filters {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+    }
+
+    .filters button {
+      width: 32%;
+      padding: 8px;
+      font-size: 14px;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin-top: 15px;
+    }
+
+    li {
+      background: #f1f1f1;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    li.completed {
+      text-decoration: line-through;
+      background: #d1ffd1;
+    }
+
+    .task-text {
+      flex-grow: 1;
+      margin-left: 10px;
+    }
+
+    .delete-btn {
+      background-color: #e53935;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="todo-container">
+  <h2>My To-Do List</h2>
+  <p id="taskMessage">Task accepted!</p>
+  <input type="text" id="taskInput" placeholder="New Task">
+  <button onclick="addTask()">Add Task</button>
+
+  <div class="filters">
+    <button onclick="filterTasks('all')">All</button>
+    <button onclick="filterTasks('completed')">Completed</button>
+    <button onclick="filterTasks('uncompleted')">Uncompleted</button>
+  </div>
+
+  <ul id="taskList"></ul>
+</div>
+
+<script>
+  let tasks = [];
+
+  function addTask() {
+    const taskInput = document.getElementById("taskInput");
+    const taskMessage = document.getElementById("taskMessage");
+    const taskText = taskInput.value.trim();
+    if (taskText === "") return;
+
+    tasks.push({ text: taskText, completed: false });
+    taskInput.value = "";
+
+    // Show task accepted message briefly
+    taskMessage.style.display = "block";
+    setTimeout(() => taskMessage.style.display = "none", 2000);
+
+    renderTasks();
+  }
+
+  function toggleComplete(index) {
+    tasks[index].completed = !tasks[index].completed;
+    renderTasks();
+  }
+
+  function deleteTask(index) {
+    tasks.splice(index, 1);
+    renderTasks();
+  }
+
+  function filterTasks(type) {
+    renderTasks(type);
+  }
+
+  function renderTasks(filter = "all") {
+    const taskList = document.getElementById("taskList");
+    taskList.innerHTML = "";
+
+    const filtered = tasks.filter(task => {
+      if (filter === "all") return true;
+      if (filter === "completed") return task.completed;
+      if (filter === "uncompleted") return !task.completed;
+    });
+
+    filtered.forEach((task, index) => {
+      const li = document.createElement("li");
+      li.className = task.completed ? "completed" : "";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = task.completed;
+      checkbox.onchange = () => toggleComplete(index);
+
+      const span = document.createElement("span");
+      span.textContent = task.text;
+      span.className = "task-text";
+
+      const delBtn = document.createElement("button");
+      delBtn.textContent = "Delete";
+      delBtn.className = "delete-btn";
+      delBtn.onclick = () => deleteTask(index);
+
+      li.appendChild(checkbox);
+      li.appendChild(span);
+      li.appendChild(delBtn);
+      taskList.appendChild(li);
+    });
+  }
+</script>
+
+</body>
+</html>
